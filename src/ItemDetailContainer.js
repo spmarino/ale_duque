@@ -1,40 +1,45 @@
-import {useEffect, useState} from "react"
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
 import ItemDetail from "./ItemDetail"
-import {useParams} from "react-router-dom"
-import productosIniciales from "./productos.json"
+import { db } from "./firebase"
+import { getDoc , doc , collection  } from "firebase/firestore"
 
 const ItemDetailContainer = () => {
 
-  const {id} = useParams()
   const [cargando,setCargando] = useState(true)
-  const  [producto,setProducto] = useState({})
+  const [producto,setProducto] = useState({})
+  const {id} = useParams()
 
   useEffect(()=>{
-    
-    
-    const pedido = new Promise((res)=>{
-      setTimeout(()=>{
-        res(productosIniciales)
-      },500)
-    })
 
-  
-    pedido
-    .then((res)=>{
-      setCargando(false)
-      setProducto(res.find((item)=>item.id == id))
-    })
-  }, [id])
+
+    const productoCollection = collection(db,"productos")
+    const resultadoDelDoc = doc(productoCollection,id)
+    const consulta = getDoc(resultadoDelDoc)
+    
+    consulta
+      .then((resultado)=>{
+        setProducto(resultado.data())
+        setCargando(false)
+      })
+      .catch((error)=>{
+        console.log(error)
+        setCargando(false)
+      })
+  },[id])
 
   if(cargando){
-    return(
-      <p>cargando...</p>
+    return (
+      <p>Cargando...</p>
     )
   }else{
     return (
-      <ItemDetail producto={producto}/>
+      <>
+        <ItemDetail producto={producto} id ={id}/>
+        {console.log(producto)}
+      </>
     )
   }
-    
 }
+
 export default ItemDetailContainer

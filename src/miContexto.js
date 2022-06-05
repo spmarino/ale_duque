@@ -1,45 +1,58 @@
-import { createContext, useState } from "react"
+import { createContext, useState } from "react";
+import { toast } from "react-toastify";
 
-export const contexto = createContext()
-const { Provider } = contexto
+export const contexto = createContext();
+const { Provider } = contexto;
 
+const MiCustomProvider = ({ children }) => {
+  const [carrito, setCarrito] = useState([]);
+  const [total, setTotal] = useState(0);
 
-const MiCustomProvider = ({children}) => {
+  const addItem = (contador, producto, id) => {
+    let cartProduct = { producto, contador, id };
 
-  const [carrito,setCarrito] = useState([])
-  const [cantidad_total,setCantidad_total] = useState(0)
-  const [precio_total,setPrecio_total] = useState(0)
+    let cartAux = [];
 
+    if (isInCart(id)) {
+      cartProduct = carrito.find((item) => item.id === id);
 
-  const agregarProducto = (producto,cantidad) => {
-  }
+      cartProduct.contador = cartProduct.contador + contador;
 
-  const eliminarProducto = (id) => {
-    
-  }
+      cartAux = [...cartProduct];
+    } else {
+      cartAux = [cartProduct, ...carrito];
+    }
+    setCarrito(cartAux);
+  };
 
-  const vaciarCarrito = () => {
-    setCarrito([])
-  }
+  const IconCart = () => {
+    return carrito.reduce((acum, i) => acum + i.contador, 0);
+  };
 
-  const estaEnCarrito = (producto) => {
-  }
+  const PriceTotal = () => {
+    return carrito.reduce((acum, i) => acum + i.contador * i.producto.Precio, 0);
+  };
+
+  const removeItem = (id) => {
+    setCarrito(carrito.filter((item) => item.id !== id));
+  };
+  const clearCart = () => {
+    setCarrito([]);
+  };
+  const isInCart = (id) => {
+    return carrito && carrito.some((item) => item.producto.id === id);
+  };
 
   const valorDelContexto = {
-    cantidad_total ,
-    precio_total ,
-    carrito ,
-    agregarProducto ,
-    eliminarProducto , 
-    vaciarCarrito ,
-    estaEnCarrito
-  }
+    carrito,
+    addItem,
+    removeItem,
+    clearCart,
+    IconCart,
+    PriceTotal
+  };
 
-  return (
-    <Provider value={valorDelContexto} >
-      {children}
-    </Provider>
-  )
-}
+  return <Provider value={valorDelContexto}>{children}</Provider>;
+};
 
-export default MiCustomProvider
+export default MiCustomProvider;

@@ -1,24 +1,26 @@
-import Contador from "./Contador"
+import { useContext, useState } from "react";
+import Hijo from "./Hijo";
+import { contexto } from "./miContexto";
+import Contador from "./Contador";
+import { toast } from "react-toastify";
 
-const ItemDetail = ({producto}) => {
+const ItemDetail = ({ producto, id }) => {
+  const { addItem } = useContext(contexto);
 
   const onAdd = (contador) => {
-   console.log(contador)
-    }
+    addItem(contador, producto, id);
+    toast.success("Se ha agregado su producto al carrito");
+  };
 
   return (
-    
-
-
-      <div> <h1>Detalle del producto</h1>
-      <p>{producto.nombre}
-      </p>
-      <img src="https://via.placeholder.com/300" alt=""/>
-      <p>Precio : {producto.precio}</p>
-       <Contador stock={10} init={1} onAdd={onAdd}/>
-       
+    <div>
+      <p>{producto.Descripcion}</p>
+      <img src={producto.imagen} alt="" width={300} />
+      <p>Precio : ${producto.Precio}</p>
+      <button>Agregar al carrito</button>
+      <Contador stock={producto.stock} init={1} onAdd={onAdd} />
     </div>
-  )
-}
+  );
+};
 
-export default ItemDetail
+export default ItemDetail;
